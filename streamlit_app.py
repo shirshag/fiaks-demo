@@ -74,8 +74,8 @@ if uploaded_file is not None:
     if st.button("Filter Messages"):
         if st_date and end_date:
             try:
-                start_date = datetime.strptime(st_date, '%d/%m/%Y')
-                end_date = datetime.strptime(end_date, '%d/%m/%Y')
+                start_date = datetime.strptime(st_date, '%d/%m/%y')
+                end_date = datetime.strptime(end_date, '%d/%m/%y')
                 filtered_df = filter_messages(messages_df, start_date, end_date)
                 
                 total_messages, person_message_count, media_counts, month_wise_data = analyze_messages(filtered_df)
