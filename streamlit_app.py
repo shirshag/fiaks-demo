@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import re
 from datetime import datetime
+import plotly.express as px
 
 def parse_whatsapp_chat(content):
     lines = content.split('\n')
@@ -56,8 +57,8 @@ def analyze_messages(df):
     person_message_count = df['Name'].value_counts().to_frame('Total Messages')
     df['Is Media'] = df['Message'].apply(lambda x: 'Media' if '<Media omitted>' in x else 'Text')
     media_counts = df.pivot_table(index='Name', columns='Is Media', aggfunc='size', fill_value=0)
-    month_wise_data = df.resample('M', on='Date')['Message'].count()
-
+    month_wise_data = df.resample('M', on='Date')['Message'].count().reset_index()
+    month_wise_data['Month'] = month_wise_data['Date'].dt.strftime('%Y-%m')
     return total_messages, person_message_count, media_counts, month_wise_data
 
 # Streamlit app
@@ -83,7 +84,11 @@ if uploaded_file is not None:
                 st.write("Total messages in this timeline:", total_messages)
                 st.write("Person-wise total messages:", person_message_count)
                 st.write("Breakdown of text and media messages:", media_counts)
-                st.write("Month-wise message data:", month_wise_data)
+
+                # Plotting month-wise message data
+                fig = px.line(month_wise_data, x='Month', y='Message', title='Month-wise Message Counts', markers=True)
+                st.plotly_chart(fig, use_container_width=True)
+                
             except ValueError as e:
                 st.error("Error in date format: " + str(e))
         else:
